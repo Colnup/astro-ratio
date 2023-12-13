@@ -28,7 +28,7 @@ class ImageModel:
         result_float = cv2.subtract(stars_float, gradient_float)
 
         # Récupere le gradient de l'image et l'enregistre dans un fichier
-        gradient = result_float[0:100, 0:100]
+        # gradient = result_float[0:100, 0:100]
 
         # Limiter les valeurs à l'intervalle [0, 255] et convertir de nouveau en uint8
         result_image_cv2 = np.clip(result_float, 0, 255).astype("uint8")
@@ -36,6 +36,6 @@ class ImageModel:
         # save
 
         cv2.imwrite("img/result.png", result_image_cv2)
-        cv2.imwrite("img/result_gradient.png", gradient)
+        # cv2.imwrite("img/result_gradient.png", gradient)
 
         return result_image_cv2, result_float
