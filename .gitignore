@@ -5,3 +5,6 @@
 
 # MacOS specific files
 .DS_Store
+
+# Output of algorithms
+img/output/
