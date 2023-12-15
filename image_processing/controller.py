@@ -1,21 +1,19 @@
-# controller.py
-
-from image_processing.model import ImageModel
-from image_processing.view import MainUI
-
-
 class Controller:
     def __init__(self):
-        self.model = ImageModel()
-        self.main_ui = MainUI(self)
+        pass
 
-    def show(self):
-        self.main_ui.show()
+    def choose_image(self):
+        # Logique pour choisir une image
+        pass
 
-    def setImagePath(self, path):
-        self.model.image_path = path
+    def select_folder(self):
+        # Logique pour sélectionner un dossier et mettre toutes les images ( png, jpg, jpeg ) dans un combo box
+        pass
 
-    def removeGradient(self):
-        img, grad = self.model.remove_gradient()
-        # Mettre à jour l'image ici
-        self.main_ui.updateImage(img)
+    def generate_image(self):
+        # Logique pour générer une image
+        pass
+
+    def download(self):
+        # Logique pour télécharger une image
+        pass
