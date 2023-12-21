@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.controller = Controller()
         self.setWindowTitle("AstroRatio")
-        self.resize(1200, 800)
+        self.resize(1000, 600)
         self.tab_widget = QTabWidget()
         self.setCentralWidget(self.tab_widget)
         self.tab_widget.addTab(RetraitRadient(), "Retrait du radiant")

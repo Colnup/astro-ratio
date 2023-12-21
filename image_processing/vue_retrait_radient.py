@@ -20,14 +20,11 @@ class RetraitRadient(QWidget):
 
         ### Définition des layouts ###
 
-        self.mainLayout = QHBoxLayout()
-        self.imageLayout = QVBoxLayout()
-        self.imageSlider_layout = QHBoxLayout()
+        self.mainLayout = QVBoxLayout()
+        self.imageLayout = QHBoxLayout()
+        self.imagePreviewLayout = QVBoxLayout()
+        self.imageResultLayout = QVBoxLayout()
         self.buttonLayout = QVBoxLayout()
-        self.mainLayout.addLayout(self.imageLayout)
-        self.mainLayout.addLayout(self.buttonLayout)
-
-        self.setLayout(self.mainLayout)
 
         ###############################################
 
@@ -35,7 +32,7 @@ class RetraitRadient(QWidget):
         self.text_preview = QLabel("Image d'origine")
         self.text_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_preview = QLabel()
-        self.image_preview.setFixedSize(700, 300)  # Définir la taille du QLabel
+        self.image_preview.setFixedSize(450, 300)  # Définir la taille du QLabel
         self.image_preview.setScaledContents(True)
         self.image_preview.setPixmap(QPixmap("img/barnard_stacked_gradient.png"))
         self.slider = QSlider(Qt.Orientation.Vertical)
@@ -44,16 +41,24 @@ class RetraitRadient(QWidget):
         self.text_result = QLabel("Image après retrait du radiant")
         self.text_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_result = QLabel()
-        self.image_result.setFixedSize(700, 300)
+        self.image_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_result.setFixedSize(450, 300)
         self.image_result.setScaledContents(True)
         self.image_result.setPixmap(QPixmap("img/barnard_stacked_gradient.png"))
 
-        self.imageLayout.addWidget(self.text_preview)
-        self.imageSlider_layout.addWidget(self.image_preview)
-        self.imageSlider_layout.addWidget(self.slider)
-        self.imageLayout.addLayout(self.imageSlider_layout)
-        self.imageLayout.addWidget(self.text_result)
-        self.imageLayout.addWidget(self.image_result)
+        self.imagePreviewLayout.addWidget(self.text_preview)
+        self.imagePreviewLayout.addWidget(self.image_preview)
+
+        self.imageResultLayout.addWidget(self.text_result)
+        self.imageResultLayout.addWidget(self.image_result)
+
+        self.imageLayout.addLayout(self.imagePreviewLayout)
+        self.imageLayout.addWidget(self.slider)
+        self.imageLayout.addLayout(self.imageResultLayout)
+
+        self.mainLayout.addLayout(self.imageLayout)
+        self.mainLayout.addLayout(self.buttonLayout)
+        self.setLayout(self.mainLayout)
 
         ###############################################
 
@@ -67,9 +72,11 @@ class RetraitRadient(QWidget):
 
         self.combo_images = QComboBox()
         self.combo_images.addItem("Sélectionner une image")
+        self.combo_images.addItems(self.controller.get_images())
 
         self.combo_gradients = QComboBox()
         self.combo_gradients.addItem("Sélectionner un gradient")
+        self.combo_gradients.addItems(self.controller.get_gradients())
 
         self.button_generate_image = QPushButton("Générer nouvelle image")
         self.button_generate_image.clicked.connect(self.controller.generate_image)

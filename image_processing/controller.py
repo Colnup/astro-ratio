@@ -17,3 +17,11 @@ class Controller:
     def download(self):
         # Logique pour télécharger une image
         pass
+
+    def get_images(self):
+        # Logique pour récupérer toutes les images dans un dossier
+        return ["Image 1", "Image 2", "Image 3"]
+
+    def get_gradients(self):
+        # Logique pour récupérer tous les gradients dans un dossier
+        return ["Gradient 1", "Gradient 2", "Gradient 3"]
