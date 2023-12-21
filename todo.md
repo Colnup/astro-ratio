@@ -29,3 +29,12 @@
     - [ ] YAML
     - [ ] JSON
     - [ ] XML
+
+## Avant rendu final
+
+- [ ] Cleanup readme
+  - [ ] Liste des réalisations
+  - [ ] Liens vers sources utilisées
+- [ ] Cleanup code
+- [ ] Suite de tests
+- [ ] Documentation
