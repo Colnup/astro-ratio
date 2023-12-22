@@ -10,7 +10,6 @@ from image_processing.vue_type_radient import DifferentRadient
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.controller = Controller()
         self.setWindowTitle("AstroRatio")
         self.resize(1000, 600)
         self.tab_widget = QTabWidget()

@@ -16,7 +16,7 @@ class RetraitRadient(QWidget):
     def __init__(self, parent=None):
         super(RetraitRadient, self).__init__(parent)
         self.setWindowTitle("Retrait Radiant")
-        self.controller = Controller()
+        self.controller = Controller(self)
 
         ### Définition des layouts ###
 
@@ -72,7 +72,7 @@ class RetraitRadient(QWidget):
 
         self.combo_images = QComboBox()
         self.combo_images.addItem("Sélectionner une image")
-        self.combo_images.addItems(self.controller.get_images())
+        self.combo_images.currentIndexChanged.connect(self.controller.update_images)
 
         self.combo_gradients = QComboBox()
         self.combo_gradients.addItem("Sélectionner un gradient")
