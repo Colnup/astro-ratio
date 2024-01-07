@@ -1,5 +1,20 @@
 # Todo list - suivi du projet
 
+- [ ] Etablir le framework de tests qu'on va utiliser
+- [ ] Ecrire un programme de bench + utiliser `scalene` pour profiler
+- [ ] Processing enchaîné YAML (graphe acyclique)
+
+## Idées
+
+Filtre de Sobel
+Calculer dérivée (appelé gradient) -> trouver la moyenne -> trouver le vecteur à partir de la moyenne verticale et horizontale
+
+Laplacien = gradient de gradient. On peut utiliser le laplacien pour trouver les contours.
+
+Filtrage de Calman
+
+Prétraitement Alpha/Beta/Gamma
+
 ## Défis basiques
 
 - [ ] Créer une interface graphique
