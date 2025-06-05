@@ -4,6 +4,8 @@
 - [ ] Ecrire un programme de bench + utiliser `scalene` pour profiler
 - [ ] Processing enchaîné YAML (graphe acyclique)
 
+- [ ] Petit bug sur les paramètres de process: si on n'y touche pas au moins une fois ça fait crasher le programme
+
 ## Idées
 
 Filtre de Sobel

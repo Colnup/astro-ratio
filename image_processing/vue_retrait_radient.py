@@ -1,94 +1,102 @@
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtWidgets import (
-    QHBoxLayout,
+    QGridLayout,
     QVBoxLayout,
     QLabel,
-    QPushButton,
-    QComboBox,
-    QSlider,
 )
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt
-from image_processing.controller import Controller
+
+from .pipeline import Pipeline
+from .process_step import ProcessStep
 
 
 class RetraitRadient(QWidget):
+    MAX_PREVIEW_WIDTH = 600
+    MAX_PREVIEW_HEIGHT = 600
+
     def __init__(self, parent=None):
         super(RetraitRadient, self).__init__(parent)
         self.setWindowTitle("Retrait Radiant")
-        self.controller = Controller(self)
+
+        # Get the controller from the main application
 
         ### Définition des layouts ###
-
-        self.mainLayout = QVBoxLayout()
-        self.imageLayout = QHBoxLayout()
-        self.imagePreviewLayout = QVBoxLayout()
-        self.imageResultLayout = QVBoxLayout()
-        self.buttonLayout = QVBoxLayout()
+        self.main_layout = QGridLayout()
+        self.image_layout = QGridLayout()
+        self.parameters_layout = QVBoxLayout()
 
         ###############################################
 
         ### Définition du layout imageLayout ###
-        self.text_preview = QLabel("Image d'origine")
-        self.text_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_preview = QLabel()
-        self.image_preview.setFixedSize(450, 300)  # Définir la taille du QLabel
-        self.image_preview.setScaledContents(True)
-        self.image_preview.setPixmap(QPixmap("img/barnard_stacked_gradient.png"))
-        self.slider = QSlider(Qt.Orientation.Vertical)
-        self.slider.setFixedHeight(300)
+        # self.text_preview = QLabel("Image d'origine")
+        # self.text_preview.setAlignment(Qt.AlignmentFlag.AlignBottom)
+        # self.text_preview.setMaximumHeight(20)
 
-        self.text_result = QLabel("Image après retrait du radiant")
-        self.text_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.image_preview = QLabel()
+        # self.image_preview.setMaximumSize(
+        #     self.MAX_PREVIEW_WIDTH, self.MAX_PREVIEW_HEIGHT
+        # )
+        # # self.image_preview.setScaledContents(True)
+        # self.image_preview.setPixmap(QPixmap("img/barnard_stacked_gradient.png"))
+
+        self.text_result = QLabel("Traitement actuel :")
+        self.text_result.setAlignment(Qt.AlignmentFlag.AlignBottom)
+        self.text_result.setMaximumHeight(20)
         self.image_result = QLabel()
         self.image_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_result.setFixedSize(450, 300)
-        self.image_result.setScaledContents(True)
-        self.image_result.setPixmap(QPixmap("img/barnard_stacked_gradient.png"))
+        self.image_result.setMaximumSize(
+            self.MAX_PREVIEW_WIDTH, self.MAX_PREVIEW_HEIGHT
+        )
 
-        self.imagePreviewLayout.addWidget(self.text_preview)
-        self.imagePreviewLayout.addWidget(self.image_preview)
+        # self.image_layout.addWidget(self.text_preview, 0, 0)
+        # self.image_layout.addWidget(self.image_preview, 1, 0)
 
-        self.imageResultLayout.addWidget(self.text_result)
-        self.imageResultLayout.addWidget(self.image_result)
+        self.image_layout.addWidget(self.text_result, 0, 1)
+        self.image_layout.addWidget(self.image_result, 1, 1)
 
-        self.imageLayout.addLayout(self.imagePreviewLayout)
-        self.imageLayout.addWidget(self.slider)
-        self.imageLayout.addLayout(self.imageResultLayout)
+        ### Définition du layout mainLayout ###
+        self.pipeline = Pipeline()
 
-        self.mainLayout.addLayout(self.imageLayout)
-        self.mainLayout.addLayout(self.buttonLayout)
-        self.setLayout(self.mainLayout)
+        self.main_layout.addWidget(self.pipeline, 0, 0)
+        self.main_layout.addLayout(self.image_layout, 0, 1)
+        self.main_layout.addLayout(self.parameters_layout, 1, 1)
 
-        ###############################################
+        # self.mainLayout.addLayout(self.centralLayout)
+        self.setLayout(self.main_layout)
 
-        ### Définition du layout buttonLayout ###
+        ########## Connexions ##########
 
-        self.button_choose_image = QPushButton("Choisir une image")
-        self.button_choose_image.clicked.connect(self.controller.choose_image)
+        self.pipeline.changeProcessStep.connect(self.update_parameters_widget)
+        self.pipeline.changeProcessStep.connect(self.show_result_if_available)
+        self.pipeline.processedFinished.connect(self.update_result_image)
 
-        self.button_select_folder = QPushButton("Sélectionner un dossier")
-        self.button_select_folder.clicked.connect(self.controller.select_folder)
+    def update_parameters_widget(self, process: ProcessStep):
+        # Clear the layout
+        for i in reversed(range(self.parameters_layout.count())):
+            self.parameters_layout.itemAt(i).widget().setParent(None)
 
-        self.combo_images = QComboBox()
-        self.combo_images.addItem("Sélectionner une image")
-        self.combo_images.currentIndexChanged.connect(self.controller.update_images)
+        for parameter in process.get_parameters():
+            self.parameters_layout.addWidget(parameter.widget)
 
-        self.combo_gradients = QComboBox()
-        self.combo_gradients.addItem("Sélectionner un gradient")
-        self.combo_gradients.addItems(self.controller.get_gradients())
+    def show_result_if_available(self, process: ProcessStep):
+        if process.processed_image is not None:
+            self.update_result_image()
 
-        self.button_generate_image = QPushButton("Générer nouvelle image")
-        self.button_generate_image.clicked.connect(self.controller.generate_image)
+    def update_result_image(self):
+        image = self.pipeline.current_step.processed_image
+        height, width, channel = image.shape
+        qimage = QImage(
+            image.data, width, height, channel * width, QImage.Format.Format_RGB888
+        )
 
-        self.button_download = QPushButton("Télécharger")
-        self.button_download.clicked.connect(self.controller.download)
+        aspect_ratio = width / height
+        scaled_width = min(
+            self.MAX_PREVIEW_WIDTH, int(self.MAX_PREVIEW_HEIGHT * aspect_ratio)
+        )
+        scaled_height = min(
+            self.MAX_PREVIEW_HEIGHT, int(self.MAX_PREVIEW_WIDTH / aspect_ratio)
+        )
+        scaled_qimage = qimage.scaled(scaled_width, scaled_height)
 
-        self.buttonLayout.addWidget(self.button_choose_image)
-        self.buttonLayout.addWidget(self.button_select_folder)
-        self.buttonLayout.addWidget(self.combo_images)
-        self.buttonLayout.addWidget(self.combo_gradients)
-        self.buttonLayout.addWidget(self.button_generate_image)
-        self.buttonLayout.addWidget(self.button_download)
-
-        ###############################################
+        self.image_result.setPixmap(QPixmap.fromImage(scaled_qimage))
