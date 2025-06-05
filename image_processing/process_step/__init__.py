@@ -6,11 +6,13 @@ from .process_parameters import Parameter  # Exposed for typing purposes
 from .image_load import ImageLoad
 from .v_threshold import VThreshold
 from .sobel_gradient_interp import SobelGradientInterp
+from .alpha_beta_enhance import AlphaBetaEnhance
 
 AVAILABLE_PROCESSES: list[ProcessStep] = [
     ImageLoad,
     VThreshold,
     SobelGradientInterp,
+    AlphaBetaEnhance,
 ]
 
 
