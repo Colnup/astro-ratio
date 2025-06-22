@@ -1,18 +1,17 @@
 """Modules that contain the possible parameters type for the process steps"""
 
-from abc import ABC
 from typing import Any
 
-from PyQt6.QtWidgets import (
-    QWidget,
-    QSlider,
-    QPushButton,
-    QColorDialog,
-    QCheckBox,
-    QFileDialog,
-)
-from PyQt6.QtCore import Qt, pyqtSignal, QObject
+from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import (
+    QCheckBox,
+    QColorDialog,
+    QFileDialog,
+    QPushButton,
+    QSlider,
+    QWidget,
+)
 
 
 class Parameter(QObject):
@@ -28,9 +27,8 @@ class Parameter(QObject):
     @property
     def value(self) -> Any:
         if self._value is None:
-            raise Exception(
-                f"No value has been set yet for the parameter {self.__name__}"
-            )
+            message = f"No value has been set yet for the parameter {self.__name__}"
+            raise Exception(message)
         return self._value
 
     @property
@@ -148,7 +146,10 @@ class PathParameter(Parameter):
 
     def _choose_file(self) -> None:
         file_path, _ = QFileDialog.getOpenFileName(
-            self._widget, "Open file", "", "Images Files (*.png *.jpg *.jpeg *.bmp)"
+            self._widget,
+            "Open file",
+            "",
+            "Images Files (*.png *.jpg *.jpeg *.bmp)",
         )
         if file_path:
             self.update_value(file_path)

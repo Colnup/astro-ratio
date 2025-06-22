@@ -8,7 +8,6 @@ Method: Compute the edges of the image with laplacian, then blur the computed ma
         background. Finally, use the background to interpolate the gradient of the
         image."""
 
-
 import cv2
 import numpy as np
 
@@ -17,7 +16,7 @@ from .step_abc import ProcessStep
 
 class SobelGradientInterp(ProcessStep):
     name = "Sobel Gradient Interpolation"
-    parameter_types = {}
+    PARAMETER_TYPES = {}
 
     def __init__(self) -> None:
         super().__init__()
@@ -34,7 +33,9 @@ class SobelGradientInterp(ProcessStep):
 
         # Find largest area
         contours, hierarchy = cv2.findContours(
-            blur, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+            blur,
+            cv2.RETR_TREE,
+            cv2.CHAIN_APPROX_SIMPLE,
         )
 
         # Find largest contour
@@ -61,7 +62,9 @@ class SobelGradientInterp(ProcessStep):
             for j in range(self._img.shape[1]):
                 for k in range(3):
                     res[i, j, k] = np.interp(
-                        self._img[i, j, k], [background[k], 255], [0, 255]
+                        self._img[i, j, k],
+                        [background[k], 255],
+                        [0, 255],
                     )
 
         self._processed_img = res

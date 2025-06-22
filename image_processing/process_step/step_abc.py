@@ -1,22 +1,21 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Type
+from collections.abc import Callable
 
-from numpy.typing import NDArray
 import cv2
-from PyQt6.QtCore import pyqtSignal, QObject
+from numpy.typing import NDArray
 
 from .process_parameters import Parameter
 
 
 class ProcessStep(ABC):
     name: str
-    parameter_types: dict[str, Type[Parameter]]
+    PARAMETER_TYPES: dict[str, type[Parameter]]
 
     def __init__(self) -> None:
         self._img = None
         self._processed_img = None
 
-        for key, val in self.parameter_types.items():
+        for key, val in self.PARAMETER_TYPES.items():
             setattr(self, key, None)
 
             parameter = val()
@@ -37,13 +36,13 @@ class ProcessStep(ABC):
         self._img = img
 
     def update_parameter(self, key: str) -> Callable[..., None]:
-        def update(value):
+        def update(value) -> None:
             setattr(self, key, value)
 
         return update
 
     def get_parameters(self) -> list[Parameter]:
-        return [getattr(self, f"{key}_instance") for key in self.parameter_types.keys()]
+        return [getattr(self, f"{key}_instance") for key in self.PARAMETER_TYPES]
 
     # Abstract methods
 

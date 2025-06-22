@@ -4,17 +4,15 @@ Advantages: Works fast, automatic, good in most cases
 Disadvantages: Can remove bright details from the original image
 """
 
-
 import cv2
-from PyQt6.QtGui import QColor  # Typing only
 
-from .step_abc import ProcessStep
 from .process_parameters import IntParameter
+from .step_abc import ProcessStep
 
 
 class VThreshold(ProcessStep):
     name = "Value Thresholding"
-    parameter_types = {
+    PARAMETER_TYPES = {
         "max_value": IntParameter,
     }
 
@@ -35,5 +33,7 @@ class VThreshold(ProcessStep):
         # Substract mask from image
         mask = cv2.bitwise_not(mask)
         self._processed_img = cv2.bitwise_and(
-            self._processed_img, self._processed_img, mask=mask
+            self._processed_img,
+            self._processed_img,
+            mask=mask,
         )

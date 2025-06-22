@@ -1,12 +1,11 @@
-from .step_abc import ProcessStep
-
-from .process_parameters import Parameter  # Exposed for typing purposes
+from .alpha_beta_enhance import AlphaBetaEnhance
 
 # Available processes
 from .image_load import ImageLoad
-from .v_threshold import VThreshold
+from .process_parameters import Parameter  # Exposed for typing purposes
 from .sobel_gradient_interp import SobelGradientInterp
-from .alpha_beta_enhance import AlphaBetaEnhance
+from .step_abc import ProcessStep
+from .v_threshold import VThreshold
 
 AVAILABLE_PROCESSES: list[ProcessStep] = [
     ImageLoad,
@@ -19,12 +18,11 @@ AVAILABLE_PROCESSES: list[ProcessStep] = [
 ######## Sanity checks #########
 if not all(issubclass(process, ProcessStep) for process in AVAILABLE_PROCESSES):
     raise TypeError(
-        "All processes must be subclasses of ProcessStep. "
-        f"Got {AVAILABLE_PROCESSES}."
+        f"All processes must be subclasses of ProcessStep. Got {AVAILABLE_PROCESSES}.",
     )
 
 if len(AVAILABLE_PROCESSES) != len(
-    set(process.name for process in AVAILABLE_PROCESSES)
+    set(process.name for process in AVAILABLE_PROCESSES),
 ):
     raise ValueError("All processes must have a unique name.")
 

@@ -1,13 +1,12 @@
 import cv2
-import os
 
-from .step_abc import ProcessStep
 from .process_parameters import PathParameter
+from .step_abc import ProcessStep
 
 
 class ImageLoad(ProcessStep):
     name = "Charger une image"
-    parameter_types = {
+    PARAMETER_TYPES = {
         "path": PathParameter,
     }
 

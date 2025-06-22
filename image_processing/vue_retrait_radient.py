@@ -1,11 +1,17 @@
-from PyQt6.QtWidgets import QWidget
+"""Vue pour le retrait radiant.
+
+Cette vue permet de gérer le retrait radiant des images.
+Elle inclut un pipeline de traitement d'image et des paramètres configurables.
+"""
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (
     QGridLayout,
-    QVBoxLayout,
     QLabel,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtCore import Qt
 
 from .pipeline import Pipeline
 from .process_step import ProcessStep
@@ -16,7 +22,7 @@ class RetraitRadient(QWidget):
     MAX_PREVIEW_HEIGHT = 600
 
     def __init__(self, parent=None):
-        super(RetraitRadient, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Retrait Radiant")
 
         # Get the controller from the main application
@@ -24,7 +30,10 @@ class RetraitRadient(QWidget):
         ### Définition des layouts ###
         self.main_layout = QGridLayout()
         self.image_layout = QGridLayout()
+        self.parameters_widget = QWidget()
         self.parameters_layout = QVBoxLayout()
+
+        self.parameters_widget.setMinimumWidth(100)
 
         ###############################################
 
@@ -45,8 +54,9 @@ class RetraitRadient(QWidget):
         self.text_result.setMaximumHeight(20)
         self.image_result = QLabel()
         self.image_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_result.setMaximumSize(
-            self.MAX_PREVIEW_WIDTH, self.MAX_PREVIEW_HEIGHT
+        self.image_result.setMinimumSize(
+            self.MAX_PREVIEW_WIDTH,
+            self.MAX_PREVIEW_HEIGHT,
         )
 
         # self.image_layout.addWidget(self.text_preview, 0, 0)
@@ -60,16 +70,18 @@ class RetraitRadient(QWidget):
 
         self.main_layout.addWidget(self.pipeline, 0, 0)
         self.main_layout.addLayout(self.image_layout, 0, 1)
-        self.main_layout.addLayout(self.parameters_layout, 1, 1)
+        # self.main_layout.addLayout(self.parameters_layout, 0, 2)
+        self.parameters_widget.setLayout(self.parameters_layout)
+        self.main_layout.addWidget(self.parameters_widget, 0, 2)
 
         # self.mainLayout.addLayout(self.centralLayout)
         self.setLayout(self.main_layout)
 
         ########## Connexions ##########
 
-        self.pipeline.changeProcessStep.connect(self.update_parameters_widget)
-        self.pipeline.changeProcessStep.connect(self.show_result_if_available)
-        self.pipeline.processedFinished.connect(self.update_result_image)
+        self.pipeline.change_process_step_signal.connect(self.update_parameters_widget)
+        self.pipeline.change_process_step_signal.connect(self.show_result_if_available)
+        self.pipeline.process_finished_signal.connect(self.update_result_image)
 
     def update_parameters_widget(self, process: ProcessStep):
         # Clear the layout
@@ -87,15 +99,21 @@ class RetraitRadient(QWidget):
         image = self.pipeline.current_step.processed_image
         height, width, channel = image.shape
         qimage = QImage(
-            image.data, width, height, channel * width, QImage.Format.Format_RGB888
+            image.data,
+            width,
+            height,
+            channel * width,
+            QImage.Format.Format_RGB888,
         )
 
         aspect_ratio = width / height
         scaled_width = min(
-            self.MAX_PREVIEW_WIDTH, int(self.MAX_PREVIEW_HEIGHT * aspect_ratio)
+            self.MAX_PREVIEW_WIDTH,
+            int(self.MAX_PREVIEW_HEIGHT * aspect_ratio),
         )
         scaled_height = min(
-            self.MAX_PREVIEW_HEIGHT, int(self.MAX_PREVIEW_WIDTH / aspect_ratio)
+            self.MAX_PREVIEW_HEIGHT,
+            int(self.MAX_PREVIEW_WIDTH / aspect_ratio),
         )
         scaled_qimage = qimage.scaled(scaled_width, scaled_height)
 

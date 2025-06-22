@@ -1,8 +1,19 @@
 # main.py
 
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget
+from typing import TYPE_CHECKING, cast
+
+from PyQt6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QTabWidget,
+)
+
 from image_processing.vue_retrait_radient import RetraitRadient
+
+if TYPE_CHECKING:
+    from PyQt6.QtGui import QAction
+    from PyQt6.QtWidgets import QMenu, QMenuBar
 
 
 class MainWindow(QMainWindow):
@@ -18,9 +29,8 @@ class MainWindow(QMainWindow):
         # self.tab_widget.addTab(DifferentRadient(), "Différents types de radiants")
 
         ###### Menu ######
-
-        self.menu = self.menuBar()
-        self.file_menu = self.menu.addMenu("Fichier")
+        self.menu = cast("QMenuBar", self.menuBar())
+        self.file_menu = cast("QMenu", self.menu.addMenu("Fichier"))
 
         # self.open_action = self.file_menu.addAction("Ouvrir une image")
         # # self.open_action.triggered.connect(self.controller.choose_image)
@@ -34,32 +44,44 @@ class MainWindow(QMainWindow):
 
         self.file_menu.addSeparator()
 
-        self.save_action = self.file_menu.addAction("Sauvegarder le résultat")
+        self.save_action = cast(
+            "QAction",
+            self.file_menu.addAction("Sauvegarder le résultat"),
+        )
         self.save_action.triggered.connect(lambda x: x)
-        # TODO - Sauvegarde des fichiers
+        # TODO (CPR): Sauvegarde des fichiers
         self.save_action.setShortcut("Ctrl+S")
 
-        self.process_menu = self.menu.addMenu("Calcul")
-        self.process_action = self.process_menu.addAction("Calculer actuel")
+        self.process_menu = cast("QMenu", self.menu.addMenu("Calcul"))
+        self.process_action = cast(
+            "QAction",
+            self.process_menu.addAction("Calculer actuel"),
+        )
         self.process_action.triggered.connect(
-            self.retrait_radient.pipeline.process_selected_step
+            self.retrait_radient.pipeline.process_selected_step,
         )
         self.process_action.setShortcut("Ctrl+R")
 
-        self.process_all_action = self.process_menu.addAction("Calculer tout")
+        self.process_all_action = cast(
+            "QAction",
+            self.process_menu.addAction("Calculer tout"),
+        )
         self.process_all_action.triggered.connect(
-            self.retrait_radient.pipeline.process_all
+            self.retrait_radient.pipeline.process_all,
         )
         self.process_all_action.setShortcut("Ctrl+Shift+R")
 
         # Calculer automatiquement
         self.process_menu.addSeparator()
-        self.auto_process_action = self.process_menu.addAction(
-            "Calculer au changement des paramètres"
+        self.auto_process_action = cast(
+            "QAction",
+            self.process_menu.addAction(
+                "Calculer au changement des paramètres",
+            ),
         )
         self.auto_process_action.setCheckable(True)
         self.auto_process_action.triggered.connect(
-            self.retrait_radient.pipeline.set_auto_process
+            self.retrait_radient.pipeline.set_auto_process,
         )
         self.auto_process_action.setShortcut("Ctrl+Alt+R")
 

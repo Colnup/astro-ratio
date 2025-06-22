@@ -1,13 +1,12 @@
 import cv2
-import numpy as np
 
-from .step_abc import ProcessStep
 from .process_parameters import IntParameter
+from .step_abc import ProcessStep
 
 
 class AlphaBetaEnhance(ProcessStep):
     name = "Alpha Beta Enhance"
-    parameter_types = {
+    PARAMETER_TYPES = {
         "alpha": IntParameter,
         "beta": IntParameter,
     }
@@ -20,5 +19,7 @@ class AlphaBetaEnhance(ProcessStep):
 
     def process(self) -> None:
         self._processed_img = cv2.convertScaleAbs(
-            self._img.copy(), alpha=self.alpha, beta=self.beta
+            self._img.copy(),
+            alpha=self.alpha,
+            beta=self.beta,
         )

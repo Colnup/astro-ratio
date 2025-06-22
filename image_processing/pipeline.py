@@ -1,21 +1,14 @@
-from typing import Type
+import typing
 
-
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtCore import QModelIndex, pyqtSignal
 from PyQt6.QtWidgets import (
-    QHBoxLayout,
-    QVBoxLayout,
-    QLabel,
-    QPushButton,
-    QComboBox,
-    QSlider,
-    QListWidget,
     QGridLayout,
-    QListWidgetItem,
+    QLabel,
+    QListWidget,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt, pyqtSignal, QModelIndex
-
 
 from .process_step import (
     AVAILABLE_PROCESSES,
@@ -30,11 +23,11 @@ class Pipeline(QWidget):
     Composed of a list, a button to add a step and a button to remove a step
     """
 
-    changeProcessStep = pyqtSignal(ProcessStep)
-    processedFinished = pyqtSignal()
+    change_process_step_signal = pyqtSignal(ProcessStep)
+    process_finished_signal = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super(Pipeline, self).__init__(parent)
+    def __init__(self, parent: typing.Optional["QWidget"] = None) -> None:
+        super().__init__(parent)
 
         ######### Variables ########
         self.auto_process = False
@@ -49,7 +42,7 @@ class Pipeline(QWidget):
         self.available_processes_label = QLabel("Available processes")
         self.available_processes_widget = QListWidget()
         self.available_processes_widget.addItems(
-            [step.name for step in AVAILABLE_PROCESSES]
+            [step.name for step in AVAILABLE_PROCESSES],
         )
 
         self.plus_button = QPushButton(">>")
@@ -83,7 +76,7 @@ class Pipeline(QWidget):
         # Add
         self.plus_button.clicked.connect(self.plus_button_add_process)
         self.available_processes_widget.doubleClicked.connect(
-            self.qlistwidget_add_process
+            self.qlistwidget_add_process,
         )
 
         # Move buttons
@@ -96,7 +89,7 @@ class Pipeline(QWidget):
         # Select process
         self.selected_processes_widget.currentItemChanged.connect(self.select_process)
 
-    def add_process(self, process: Type[ProcessStep]):
+    def add_process(self, process: type[ProcessStep]) -> None:
         """Add a process to the pipeline.
         Two entry points: the plus button and the double click on the available list
 
@@ -113,10 +106,10 @@ class Pipeline(QWidget):
 
         self.selected_processes.append(new_process)
         self.selected_processes_widget.setCurrentRow(
-            self.selected_processes_widget.count() - 1
+            self.selected_processes_widget.count() - 1,
         )
 
-    def remove_process(self, process):
+    def remove_process(self, /) -> None:
         """Remove a process from the pipeline"""
         # Remove from the backend class list
         if self.selected_processes_widget.currentRow() == -1:
@@ -127,14 +120,16 @@ class Pipeline(QWidget):
         self.selected_processes_widget.setCurrentRow(selected_idx - 1)
         self.selected_processes_widget.takeItem(selected_idx)
 
-    def plus_button_add_process(self):
+    def plus_button_add_process(self) -> None:
         """Add a process to the pipeline via the button"""
 
         if self.available_processes_widget.currentItem() is not None:
             process = PROCESSES_NAME_TO_CLASSES_HASHMAP[
                 self.available_processes_widget.currentItem().text()
             ]
-            self.add_process(process)
+            return self.add_process(process)
+
+        return None
 
     def qlistwidget_add_process(self, process: QModelIndex) -> None:
         """Add a process to the pipeline via the available list"""
@@ -153,10 +148,12 @@ class Pipeline(QWidget):
         self.selected_processes_widget.setCurrentRow(selected_idx - 1)
 
         self.selected_processes_widget.insertItem(
-            selected_idx - 1, self.selected_processes_widget.takeItem(selected_idx)
+            selected_idx - 1,
+            self.selected_processes_widget.takeItem(selected_idx),
         )
         self.selected_processes.insert(
-            selected_idx - 1, self.selected_processes.pop(selected_idx)
+            selected_idx - 1,
+            self.selected_processes.pop(selected_idx),
         )
 
     def move_down(self) -> None:
@@ -171,10 +168,12 @@ class Pipeline(QWidget):
         self.selected_processes_widget.setCurrentRow(selected_idx + 1)
 
         self.selected_processes_widget.insertItem(
-            selected_idx + 1, self.selected_processes_widget.takeItem(selected_idx)
+            selected_idx + 1,
+            self.selected_processes_widget.takeItem(selected_idx),
         )
         self.selected_processes.insert(
-            selected_idx + 1, self.selected_processes.pop(selected_idx)
+            selected_idx + 1,
+            self.selected_processes.pop(selected_idx),
         )
 
         self.selected_processes_widget.setCurrentRow(selected_idx - 1)
@@ -188,20 +187,22 @@ class Pipeline(QWidget):
             self.selected_processes_widget.currentRow()
         ]
 
-        self.changeProcessStep.emit(self.current_step)
+        self.change_process_step_signal.emit(self.current_step)
 
     ######## Processing ########
 
     def process_all(self):
         """Process the image with all the steps in the pipeline"""
         for process, next_process in zip(
-            self.selected_processes, self.selected_processes[1:]
+            self.selected_processes,
+            self.selected_processes[1:],
+            strict=False,
         ):
             process.process()
             next_process.load_image(process.processed_image)
 
         self.selected_processes[-1].process()  # Process the last image
-        self.processedFinished.emit()
+        self.process_finished_signal.emit()
 
     def set_auto_process(self, auto_process: bool):
         """Set the auto process mode"""
@@ -232,8 +233,8 @@ class Pipeline(QWidget):
                 self.selected_processes[idx].process()
             else:
                 self.selected_processes[idx].load_image(
-                    self.selected_processes[idx - 1].processed_image
+                    self.selected_processes[idx - 1].processed_image,
                 )
                 self.selected_processes[idx].process()
 
-        self.processedFinished.emit()
+        self.process_finished_signal.emit()
